@@ -1,0 +1,152 @@
+package com.example.myapplication1;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends Activity {
+
+    private List<String> stock = new ArrayList<>();
+    private List<String> orders = new ArrayList<>();
+
+    private EditText editProductName;
+    private EditText editProductToRemove;
+    private TextView txtStock;
+    private EditText editCustomerName;
+    private EditText editOrderProduct;
+    private EditText editOrderCode;
+    private Button btnAddProduct;
+    private Button btnRemoveProduct;
+    private Button btnAddOrder;
+    private EditText editOrderToRemove;
+    private Button btnRemoveOrder;
+    private TextView txtOrders;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Inicialize os elementos do layout
+        editProductName = findViewById(R.id.editProductName);
+        editProductToRemove = findViewById(R.id.editProductToRemove);
+        txtStock = findViewById(R.id.txtStock);
+        editCustomerName = findViewById(R.id.editCustomerName);
+        editOrderProduct = findViewById(R.id.editOrderProduct);
+        editOrderCode = findViewById(R.id.editOrderCode);
+        btnAddProduct = findViewById(R.id.btnAddProduct);
+        btnRemoveProduct = findViewById(R.id.btnRemoveProduct);
+        btnAddOrder = findViewById(R.id.btnAddOrder);
+        editOrderToRemove = findViewById(R.id.editOrderToRemove);
+        btnRemoveOrder = findViewById(R.id.btnRemoveOrder);
+        txtOrders = findViewById(R.id.txtOrders);
+
+        // Configurar o OnClickListener para Adicionar Produto
+        btnAddProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String productName = editProductName.getText().toString();
+                if (!productName.isEmpty()) {
+                    stock.add(productName);
+                    updateStockText();
+                    editProductName.getText().clear();
+                    Toast.makeText(MainActivity.this, "Produto adicionado ao estoque: " + productName, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Digite um nome de produto válido", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Configurar o OnClickListener para Remover Produto
+        btnRemoveProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String productToRemove = editProductToRemove.getText().toString();
+                if (!productToRemove.isEmpty()) {
+                    if (stock.remove(productToRemove)) {
+                        updateStockText();
+                        editProductToRemove.getText().clear();
+                        Toast.makeText(MainActivity.this, "Produto removido do estoque: " + productToRemove, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Produto não encontrado no estoque", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "Digite um nome de produto válido para remover", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Configurar o OnClickListener para Adicionar Pedido
+        btnAddOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String customerName = editCustomerName.getText().toString();
+                String orderProduct = editOrderProduct.getText().toString();
+                String orderCodeStr = editOrderCode.getText().toString();
+                if (!customerName.isEmpty() && !orderProduct.isEmpty() && !orderCodeStr.isEmpty()) {
+                    int orderCode = Integer.parseInt(orderCodeStr);
+                    orders.add("Código: " + orderCode + ", Cliente: " + customerName + ", Produto: " + orderProduct);
+                    updateOrdersText();
+                    editCustomerName.getText().clear();
+                    editOrderProduct.getText().clear();
+                    editOrderCode.getText().clear();
+                    Toast.makeText(MainActivity.this, "Pedido adicionado: " + orderCode, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Preencha todos os campos do pedido", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Configurar o OnClickListener para Remover Pedido
+        btnRemoveOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String orderCodeStr = editOrderToRemove.getText().toString();
+                if (!orderCodeStr.isEmpty()) {
+                    int orderCode = Integer.parseInt(orderCodeStr);
+                    boolean removed = false;
+                    for (int i = 0; i < orders.size(); i++) {
+                        if (orders.get(i).startsWith("Código: " + orderCode)) {
+                            orders.remove(i);
+                            removed = true;
+                            break;
+                        }
+                    }
+                    if (removed) {
+                        updateOrdersText();
+                        editOrderToRemove.getText().clear();
+                        Toast.makeText(MainActivity.this, "Pedido removido: " + orderCode, Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Pedido não encontrado", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "Digite um código de pedido válido para remover", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void updateStockText() {
+        StringBuilder stockInfo = new StringBuilder("Estoque:\n");
+        for (String product : stock) {
+            stockInfo.append(product).append("\n");
+        }
+        txtStock.setText(stockInfo.toString());
+    }
+
+    private void updateOrdersText() {
+        StringBuilder ordersInfo = new StringBuilder("Pedidos:\n");
+        for (String order : orders) {
+            ordersInfo.append(order).append("\n");
+        }
+        txtOrders.setText(ordersInfo.toString());
+    }
+}
